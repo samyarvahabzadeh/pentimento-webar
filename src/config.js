@@ -19,7 +19,7 @@ export const CONFIG = {
 
   // استفاده از مدل fallback ساخته شده با A-Frame primitives
   // برای لود کردن فایلی که دانلود کرده‌اید، این مقدار را false کنید
-  useFallbackModel: true,
+  useFallbackModel: false,
 
   // تنظیمات شیء AR (چه مدل GLB چه مدل fallback)
   arObject: {
