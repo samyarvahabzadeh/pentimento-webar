@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>راهنمای تست - Pentimento AR</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+    background: #0a0a0a;
+    color: #f5f0e8;
+    min-height: 100vh;
+    direction: rtl;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    color: #c9a96e;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .subtitle {
+    text-align: center;
+    color: rgba(245,240,232,0.5);
+    font-size: 0.85rem;
+    margin-bottom: 32px;
+  }
+  .section {
+    background: rgba(30,25,20,0.6);
+    border: 1px solid rgba(180,150,110,0.15);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .section h2 {
+    font-size: 1.1rem;
+    color: #c9a96e;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .steps {
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps li {
+    counter-increment: step;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(180,150,110,0.08);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: rgba(201,169,110,0.15);
+    color: #c9a96e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .warning {
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.25);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #e8d5b5;
+  }
+  .warning strong { color: #c9a96e; }
+  .file-path {
+    direction: ltr;
+    text-align: left;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(180,150,110,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: #c9a96e;
+    margin: 8px 0;
+    word-break: break-all;
+  }
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #c9a96e, #a88a4e);
+    color: #1a1410;
+    text-decoration: none;
+    border-radius: 100px;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 8px 4px;
+    transition: transform 0.2s;
+  }
+  .link-btn:active { transform: scale(0.97); }
+  .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .note {
+    font-size: 0.8rem;
+    color: rgba(245,240,232,0.4);
+    text-align: center;
+    margin-top: 32px;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>☕ راهنمای تست Pentimento AR</h1>
+  <p class="subtitle">نسخه تست — نحوه استفاده و فایل‌های مورد نیاز</p>
+
+  <div class="section">
+    <h2>📋 مراحل تست</h2>
+    <ol class="steps">
+      <li>QR کد را با دوربین گوشی اسکن کنید (فایل QR در پروژه موجود است)</li>
+      <li>سایت AR باز می‌شود. دکمه <strong>«شروع تجربه»</strong> را بزنید</li>
+      <li>اجازه دسترسی به دوربین بدهید</li>
+      <li>فایل <strong>sample-marker.png</strong> را روی مانیتور یا لپ‌تاپ دیگری باز کنید، یا آن را چاپ کنید</li>
+      <li>دوربین گوشی را به سمت marker بگیرید</li>
+      <li>صحنه سه‌بعدی کافه (فنجان قهوه + بخار + کروسان) روی marker ظاهر می‌شود!</li>
+      <li>دکمه «ورود به پیج اینستاگرام» ظاهر می‌شود → می‌توانید کلیک کنید</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>📁 فایل‌های مهم</h2>
+
+    <p style="margin-bottom: 8px;"><strong>🔗 لینک سایت AR:</strong></p>
+    <div class="file-path">https://samyarvahabzadeh.github.io/pentimento-webar/</div>
+
+    <p style="margin-bottom: 8px; margin-top: 16px;"><strong>📷 تصویر marker تست (این را نشان دهید به دوربین):</strong></p>
+    <div class="file-path">public/targets/sample-marker.png</div>
+
+    <p style="margin-bottom: 8px; margin-top: 16px;"><strong>📱 فایل QR کد:</strong></p>
+    <div class="file-path">public/qr/qr.png</div>
+    <div class="file-path">public/qr/qr.svg</div>
+
+    <p style="margin-bottom: 8px; margin-top: 16px;"><strong>🖨️ کارت قابل چاپ:</strong></p>
+    <div class="file-path">public/print/pentimento-ar-card.html</div>
+
+    <p style="margin-bottom: 8px; margin-top: 16px;"><strong>🎯 فایل target (MindAR):</strong></p>
+    <div class="file-path">public/targets/card.mind</div>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ نکات مهم نسخه تست</h2>
+    <div class="warning">
+      <strong>QR و marker فعلاً جدا هستند:</strong><br>
+      در این نسخه تست، QR کد لینک سایت AR را باز می‌کند.
+      اما تصویری که دوربین شناسایی می‌کند (marker) فایل <code>sample-marker.png</code> است
+      که تصویر نمونه رسمی MindAR است.<br><br>
+
+      <strong>برای تست:</strong><br>
+      ۱. QR را اسکن کنید تا سایت باز شود<br>
+      ۲. سپس دوربین را روی فایل <code>sample-marker.png</code> بگیرید
+      (می‌توانید آن را روی صفحه لپ‌تاپ یا تبلت نمایش دهید)<br><br>
+
+      <strong>نسخه نهایی:</strong><br>
+      در نسخه نهایی، یک کارت واحد طراحی می‌شود که هم QR و هم عناصر بصری
+      برای tracking را شامل شود. سپس از آن کارت یک target جدید ساخته می‌شود
+      و جایگزین card.mind فعلی می‌شود.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🔧 شخصی‌سازی</h2>
+    <p style="line-height: 1.8; font-size: 0.9rem;">
+      تمام تنظیمات قابل ویرایش در فایل زیر هستند:
+    </p>
+    <div class="file-path">src/config.js</div>
+    <p style="line-height: 1.8; font-size: 0.85rem; margin-top: 8px; color: rgba(245,240,232,0.6);">
+      لینک اینستاگرام • مسیر مدل سه‌بعدی • مسیر target •
+      متن‌های فارسی • اندازه و موقعیت شیء AR • تنظیمات انیمیشن
+    </p>
+  </div>
+
+  <p class="note">
+    Pentimento WebAR — نسخه تست<br>
+    ساخته شده با MindAR + Three.js
+  </p>
+
+</div>
+</body>
+</html>

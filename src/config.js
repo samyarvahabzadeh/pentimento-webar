@@ -2,15 +2,19 @@
  * Pentimento WebAR Configuration
  * تنظیمات قابل ویرایش پروژه
  */
+
+// Base URL از Vite (برای GitHub Pages)
+const BASE = import.meta.env.BASE_URL;
+
 export const CONFIG = {
   // لینک اینستاگرام CTA
   instagramUrl: 'https://www.instagram.com/pentimento.ir',
 
-  // مسیر فایل target برای MindAR
-  targetPath: '/targets/card.mind',
+  // مسیر فایل target برای MindAR (نسبت به base)
+  targetPath: BASE + 'targets/card.mind',
 
   // مسیر مدل سه‌بعدی (در صورت استفاده از مدل خارجی)
-  modelPath: '/models/coffee-cup.glb',
+  modelPath: BASE + 'models/coffee-cup.glb',
 
   // استفاده از مدل fallback ساخته شده با Three.js
   useFallbackModel: true,

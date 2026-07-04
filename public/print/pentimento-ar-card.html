@@ -1,147 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Pentimento AR Card - Print This</title>
+<title>Pentimento AR - کارت تستی قابل چاپ</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  
+
   body {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     background: #f0ebe3;
     font-family: 'Vazirmatn', sans-serif;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    font-size: 20px;
+    color: #1a1410;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .instructions {
+    max-width: 500px;
+    background: white;
+    border: 1px solid #e0d5c5;
+    border-radius: 12px;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 2;
+    color: #4a3f35;
+  }
+
+  .instructions h2 {
+    font-size: 16px;
+    color: #1a1410;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0d5c5;
+  }
+
+  .instructions ol {
+    padding-right: 20px;
+  }
+
+  .instructions li {
+    margin-bottom: 6px;
+  }
+
+  .instructions .warn {
+    background: #fff8e6;
+    border: 1px solid #e6d5a0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #8a6e2e;
   }
 
   .card {
     width: 400px;
-    height: 600px;
+    height: 580px;
     background: #faf7f2;
     border: 2px solid #c9a96e;
     border-radius: 16px;
-    padding: 30px;
+    padding: 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
     overflow: hidden;
+    page-break-inside: avoid;
   }
 
-  /* Decorative corners */
   .card::before, .card::after {
     content: '';
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border: 2px solid #c9a96e;
     opacity: 0.4;
   }
   .card::before {
-    top: 12px; left: 12px;
+    top: 10px; left: 10px;
     border-right: none; border-bottom: none;
-    border-top-left-radius: 12px;
+    border-top-left-radius: 10px;
   }
   .card::after {
-    bottom: 12px; right: 12px;
+    bottom: 10px; right: 10px;
     border-left: none; border-top: none;
-    border-bottom-right-radius: 12px;
+    border-bottom-right-radius: 10px;
   }
 
-  /* Background pattern for tracking */
   .bg-pattern {
     position: absolute;
     inset: 0;
-    opacity: 0.06;
-    background-image: 
+    opacity: 0.05;
+    background-image:
       radial-gradient(circle at 20% 30%, #8B4513 1px, transparent 1px),
       radial-gradient(circle at 80% 70%, #8B4513 1px, transparent 1px),
-      radial-gradient(circle at 50% 50%, #8B4513 0.5px, transparent 0.5px),
-      radial-gradient(circle at 30% 80%, #8B4513 1.5px, transparent 1.5px),
-      radial-gradient(circle at 70% 20%, #8B4513 1px, transparent 1px);
-    background-size: 40px 40px, 35px 35px, 25px 25px, 45px 45px, 30px 30px;
-  }
-
-  /* High contrast patterns for image tracking */
-  .tracking-elements {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .corner-mark {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-  }
-
-  .corner-mark.tl { top: 40px; left: 40px; border-top: 3px solid #1a1410; border-left: 3px solid #1a1410; }
-  .corner-mark.tr { top: 40px; right: 40px; border-top: 3px solid #1a1410; border-right: 3px solid #1a1410; }
-  .corner-mark.bl { bottom: 40px; left: 40px; border-bottom: 3px solid #1a1410; border-left: 3px solid #1a1410; }
-  .corner-mark.br { bottom: 40px; right: 40px; border-bottom: 3px solid #1a1410; border-right: 3px solid #1a1410; }
-
-  /* Unique geometric shapes for tracking */
-  .track-shape {
-    position: absolute;
-    opacity: 0.12;
-  }
-
-  .track-shape.s1 {
-    top: 55px; right: 55px;
-    width: 30px; height: 30px;
-    background: #1a1410;
-    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  }
-
-  .track-shape.s2 {
-    bottom: 55px; left: 55px;
-    width: 25px; height: 25px;
-    background: #1a1410;
-    border-radius: 50%;
-  }
-
-  .track-shape.s3 {
-    top: 50%; left: 55px;
-    width: 20px; height: 20px;
-    background: #1a1410;
-    transform: rotate(45deg) translateY(-50%);
-  }
-
-  .track-shape.s4 {
-    top: 50%; right: 55px;
-    width: 15px; height: 15px;
-    background: #c9a96e;
-    border-radius: 3px;
-    transform: translateY(-50%);
+      radial-gradient(circle at 50% 50%, #8B4513 0.5px, transparent 0.5px);
+    background-size: 40px 40px, 35px 35px, 25px 25px;
   }
 
   .brand-name {
     font-family: 'Playfair Display', serif;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     color: #1a1410;
-    letter-spacing: 6px;
+    letter-spacing: 5px;
     text-transform: uppercase;
-    margin-top: 30px;
+    margin-top: 24px;
     position: relative;
     z-index: 2;
   }
 
   .divider {
-    width: 60px;
+    width: 50px;
     height: 1px;
     background: #c9a96e;
-    margin: 12px 0;
+    margin: 10px 0;
     position: relative;
     z-index: 2;
   }
 
   .tagline {
-    font-size: 11px;
+    font-size: 10px;
     color: #8a7b6b;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -149,97 +140,129 @@
     z-index: 2;
   }
 
-  /* Coffee cup illustration for tracking */
-  .cup-illustration {
-    margin: 25px 0;
+  .cup-icon {
+    margin: 16px 0;
     position: relative;
     z-index: 2;
   }
 
-  .cup-illustration svg {
-    width: 100px;
-    height: 100px;
+  .cup-icon svg {
+    width: 80px;
+    height: 80px;
     color: #1a1410;
   }
 
   .ar-badge {
     font-family: 'Vazirmatn', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: #c9a96e;
     background: #1a1410;
-    padding: 6px 20px;
-    border-radius: 20px;
+    padding: 5px 16px;
+    border-radius: 16px;
     position: relative;
     z-index: 2;
-    direction: rtl;
   }
 
-  .instruction {
+  .instruction-text {
     font-family: 'Vazirmatn', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     color: #8a7b6b;
     text-align: center;
-    direction: rtl;
     line-height: 1.8;
-    margin: 15px 0;
+    margin: 12px 0;
     position: relative;
     z-index: 2;
-    max-width: 280px;
+    max-width: 260px;
   }
 
-  .qr-placeholder {
-    width: 120px;
-    height: 120px;
+  .qr-container {
+    width: 130px;
+    height: 130px;
     border: 2px solid #1a1410;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
-    color: #8a7b6b;
-    text-align: center;
     position: relative;
     z-index: 2;
     background: white;
-    padding: 8px;
+    padding: 6px;
+  }
+
+  .qr-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .url-text {
+    font-size: 8px;
+    color: #b0a090;
+    letter-spacing: 0.5px;
+    margin-top: 6px;
+    position: relative;
+    z-index: 2;
+    direction: ltr;
   }
 
   .footer-text {
-    font-size: 9px;
-    color: #b0a090;
+    font-size: 8px;
+    color: #c0b5a5;
     letter-spacing: 2px;
     margin-top: auto;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     position: relative;
     z-index: 2;
   }
 
+  /* Print styles */
   @media print {
-    body { background: white; }
-    .card { border: 1px solid #ccc; box-shadow: none; }
+    body {
+      background: white;
+      padding: 0;
+      gap: 20px;
+    }
+    .instructions { display: none; }
+    h1 { display: none; }
+    .card {
+      border: 1px solid #ccc;
+      box-shadow: none;
+    }
   }
 </style>
 </head>
 <body>
+
+<h1>🖨️ این کارت را چاپ کنید و برای تست AR استفاده کنید</h1>
+
+<div class="instructions">
+  <h2>📋 راهنمای تست</h2>
+  <ol>
+    <li>این صفحه را چاپ کنید (یا کارت پایین را اسکرین‌شات بگیرید)</li>
+    <li>QR کد روی کارت را با گوشی اسکن کنید</li>
+    <li>سایت AR باز می‌شود → دکمه «شروع تجربه» را بزنید</li>
+    <li>اجازه دوربین بدهید</li>
+    <li>دوربین گوشی را به سمت <strong>کارت چاپ شده</strong> بگیرید</li>
+    <li>صحنه سه‌بعدی کافه روی کارت ظاهر می‌شود! ☕</li>
+  </ol>
+  <div class="warn">
+    ⚠️ <strong>نکته نسخه تست:</strong> در نسخه تست، QR و marker تستی جدا هستند.
+    QR روی کارت لینک سایت AR را باز می‌کند. اما marker واقعی که دوربین شناسایی می‌کند فایل
+    <code>sample-marker.png</code> در پوشه <code>public/targets/</code> است.
+    پس بعد از باز شدن سایت، دوربین را روی فایل sample-marker.png بگیرید (می‌توانید آن را روی مانیتور دیگری نمایش دهید یا چاپ کنید).
+    در نسخه نهایی، QR و marker روی یک کارت واحد ترکیب می‌شوند.
+  </div>
+</div>
+
 <div class="card">
   <div class="bg-pattern"></div>
-  <div class="tracking-elements">
-    <div class="corner-mark tl"></div>
-    <div class="corner-mark tr"></div>
-    <div class="corner-mark bl"></div>
-    <div class="corner-mark br"></div>
-    <div class="track-shape s1"></div>
-    <div class="track-shape s2"></div>
-    <div class="track-shape s3"></div>
-    <div class="track-shape s4"></div>
-  </div>
 
   <div class="brand-name">PENTIMENTO</div>
   <div class="divider"></div>
   <div class="tagline">SPECIALTY COFFEE</div>
 
-  <div class="cup-illustration">
+  <div class="cup-icon">
     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="50" cy="70" rx="30" ry="8" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
       <path d="M25 35 Q25 70 35 72 L65 72 Q75 70 75 35" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -252,19 +275,19 @@
   </div>
 
   <div class="ar-badge">تجربه واقعیت افزوده ☕</div>
-  
-  <p class="instruction">
+
+  <p class="instruction-text">
     QR کد را اسکن کنید<br>
-    سپس دوربین را به سمت این کارت بگیرید
+    سپس دوربین را روی marker تستی بگیرید
   </p>
 
-  <div class="qr-placeholder">
-    QR Code<br>
-    <small>Print a real QR here</small><br>
-    <small style="font-size:7px; margin-top:4px; display:block;">pentimento-webar.vercel.app</small>
+  <div class="qr-container">
+    <img src="../qr/qr.png" alt="QR Code" onerror="this.parentElement.innerHTML='<div style=&quot;font-size:10px;text-align:center;color:#999&quot;>QR<br>samyarvahabzadeh.github.io<br>/pentimento-webar/</div>'">
   </div>
+  <div class="url-text">samyarvahabzadeh.github.io/pentimento-webar</div>
 
   <div class="footer-text">AUGMENTED REALITY EXPERIENCE</div>
 </div>
+
 </body>
 </html>

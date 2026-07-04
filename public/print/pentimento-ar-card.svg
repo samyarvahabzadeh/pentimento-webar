@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="580" viewBox="0 0 400 580">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700');
+      .brand { font-family: Georgia, serif; font-size: 26px; font-weight: bold; fill: #1a1410; letter-spacing: 5px; }
+      .tagline { font-family: Georgia, serif; font-size: 10px; fill: #8a7b6b; letter-spacing: 3px; }
+      .ar-text { font-family: 'Vazirmatn', sans-serif; font-size: 12px; fill: #c9a96e; }
+      .instruction { font-family: 'Vazirmatn', sans-serif; font-size: 11px; fill: #8a7b6b; text-anchor: middle; }
+      .url { font-family: monospace; font-size: 8px; fill: #b0a090; text-anchor: middle; }
+      .footer { font-family: Georgia, serif; font-size: 8px; fill: #c0b5a5; letter-spacing: 2px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <!-- Card background -->
+  <rect width="400" height="580" rx="16" fill="#faf7f2"/>
+  <rect x="1" y="1" width="398" height="578" rx="16" fill="none" stroke="#c9a96e" stroke-width="2"/>
+
+  <!-- Corner decorations -->
+  <path d="M12 80 L12 12 L80 12" fill="none" stroke="#c9a96e" stroke-width="1.5" opacity="0.4"/>
+  <path d="M320 568 L388 568 L388 500" fill="none" stroke="#c9a96e" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Brand name -->
+  <text x="200" y="60" text-anchor="middle" class="brand">PENTIMENTO</text>
+
+  <!-- Divider -->
+  <line x1="175" y1="72" x2="225" y2="72" stroke="#c9a96e" stroke-width="1"/>
+
+  <!-- Tagline -->
+  <text x="200" y="90" text-anchor="middle" class="tagline">SPECIALTY COFFEE</text>
+
+  <!-- Coffee cup illustration -->
+  <g transform="translate(160, 110)" stroke="#1a1410" fill="none">
+    <ellipse cx="40" cy="65" rx="28" ry="7" stroke-width="1.2" opacity="0.3"/>
+    <path d="M15 30 Q15 62 24 65 L56 65 Q65 62 65 30" stroke-width="1.8"/>
+    <line x1="15" y1="30" x2="65" y2="30" stroke-width="1.8"/>
+    <path d="M65 36 Q76 36 76 46 Q76 56 65 56" stroke-width="1.3"/>
+    <path d="M32 24 Q34 16 32 8" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
+    <path d="M40 22 Q42 12 40 4" stroke-width="0.8" opacity="0.3" stroke-linecap="round"/>
+    <path d="M48 24 Q50 16 48 8" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
+  </g>
+
+  <!-- AR badge -->
+  <rect x="140" y="210" width="120" height="28" rx="14" fill="#1a1410"/>
+  <text x="200" y="229" text-anchor="middle" class="ar-text" direction="rtl">☕ تجربه واقعیت افزوده</text>
+
+  <!-- Instruction text -->
+  <text x="200" y="265" class="instruction" direction="rtl">QR کد را اسکن کنید</text>
+  <text x="200" y="283" class="instruction" direction="rtl">سپس دوربین را روی marker تستی بگیرید</text>
+
+  <!-- QR placeholder box -->
+  <rect x="135" y="305" width="130" height="130" rx="8" fill="white" stroke="#1a1410" stroke-width="2"/>
+  <text x="200" y="405" class="url" font-size="7" fill="#999">QR Code — چاپ کنید و اسکن کنید</text>
+
+  <!-- URL -->
+  <text x="200" y="470" class="url">samyarvahabzadeh.github.io/pentimento-webar</text>
+
+  <!-- Footer -->
+  <text x="200" y="555" class="footer">AUGMENTED REALITY EXPERIENCE</text>
+</svg>
