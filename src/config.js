@@ -23,23 +23,23 @@ export const CONFIG = {
     { 
       id: 'layer-bg', 
       src: BASE + 'images/layer-bg.png', 
-      width: 1.0, 
-      height: 1.2, 
-      position: { x: 0, y: 0, z: 0.01 } // لایه پس‌زمینه (چسبیده به کارت)
+      width: 1.2, 
+      height: 1.6, 
+      position: { x: 0, y: 0.1, z: 0.01 }
     },
     { 
       id: 'layer-mid', 
       src: BASE + 'images/layer-mid.png', 
-      width: 0.7, 
-      height: 0.7, 
-      position: { x: 0, y: -0.1, z: 0.08 } // لایه میانی (عمق متوسط)
+      width: 0.9, 
+      height: 0.9, 
+      position: { x: 0, y: 0.05, z: 0.12 }
     },
     { 
       id: 'layer-fg', 
       src: BASE + 'images/layer-fg.png', 
-      width: 0.8, 
-      height: 0.3, 
-      position: { x: 0, y: 0.35, z: 0.15 } // لایه جلو (نزدیک‌ترین به دوربین)
+      width: 1.0, 
+      height: 1.0, 
+      position: { x: 0, y: 0.15, z: 0.22 }
     }
   ],
 
