@@ -1,0 +1,303 @@
+/**
+ * Printable Card Generator for Pentimento WebAR
+ * Generates an HTML file that can be opened in browser and printed/screenshot
+ * 
+ * Usage: node scripts/generate-card.js
+ * Then open public/print/pentimento-ar-card.html in a browser and save as image
+ */
+
+import { writeFileSync, mkdirSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const projectRoot = join(__dirname, '..');
+
+const cardHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pentimento AR Card - Print This</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #f0ebe3;
+    font-family: 'Vazirmatn', sans-serif;
+  }
+
+  .card {
+    width: 400px;
+    height: 600px;
+    background: #faf7f2;
+    border: 2px solid #c9a96e;
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative corners */
+  .card::before, .card::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 2px solid #c9a96e;
+    opacity: 0.4;
+  }
+  .card::before {
+    top: 12px; left: 12px;
+    border-right: none; border-bottom: none;
+    border-top-left-radius: 12px;
+  }
+  .card::after {
+    bottom: 12px; right: 12px;
+    border-left: none; border-top: none;
+    border-bottom-right-radius: 12px;
+  }
+
+  /* Background pattern for tracking */
+  .bg-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    background-image: 
+      radial-gradient(circle at 20% 30%, #8B4513 1px, transparent 1px),
+      radial-gradient(circle at 80% 70%, #8B4513 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, #8B4513 0.5px, transparent 0.5px),
+      radial-gradient(circle at 30% 80%, #8B4513 1.5px, transparent 1.5px),
+      radial-gradient(circle at 70% 20%, #8B4513 1px, transparent 1px);
+    background-size: 40px 40px, 35px 35px, 25px 25px, 45px 45px, 30px 30px;
+  }
+
+  /* High contrast patterns for image tracking */
+  .tracking-elements {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .corner-mark {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+  }
+
+  .corner-mark.tl { top: 40px; left: 40px; border-top: 3px solid #1a1410; border-left: 3px solid #1a1410; }
+  .corner-mark.tr { top: 40px; right: 40px; border-top: 3px solid #1a1410; border-right: 3px solid #1a1410; }
+  .corner-mark.bl { bottom: 40px; left: 40px; border-bottom: 3px solid #1a1410; border-left: 3px solid #1a1410; }
+  .corner-mark.br { bottom: 40px; right: 40px; border-bottom: 3px solid #1a1410; border-right: 3px solid #1a1410; }
+
+  /* Unique geometric shapes for tracking */
+  .track-shape {
+    position: absolute;
+    opacity: 0.12;
+  }
+
+  .track-shape.s1 {
+    top: 55px; right: 55px;
+    width: 30px; height: 30px;
+    background: #1a1410;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  }
+
+  .track-shape.s2 {
+    bottom: 55px; left: 55px;
+    width: 25px; height: 25px;
+    background: #1a1410;
+    border-radius: 50%;
+  }
+
+  .track-shape.s3 {
+    top: 50%; left: 55px;
+    width: 20px; height: 20px;
+    background: #1a1410;
+    transform: rotate(45deg) translateY(-50%);
+  }
+
+  .track-shape.s4 {
+    top: 50%; right: 55px;
+    width: 15px; height: 15px;
+    background: #c9a96e;
+    border-radius: 3px;
+    transform: translateY(-50%);
+  }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1410;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 30px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: #c9a96e;
+    margin: 12px 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .tagline {
+    font-size: 11px;
+    color: #8a7b6b;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Coffee cup illustration for tracking */
+  .cup-illustration {
+    margin: 25px 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cup-illustration svg {
+    width: 100px;
+    height: 100px;
+    color: #1a1410;
+  }
+
+  .ar-badge {
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #c9a96e;
+    background: #1a1410;
+    padding: 6px 20px;
+    border-radius: 20px;
+    position: relative;
+    z-index: 2;
+    direction: rtl;
+  }
+
+  .instruction {
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    color: #8a7b6b;
+    text-align: center;
+    direction: rtl;
+    line-height: 1.8;
+    margin: 15px 0;
+    position: relative;
+    z-index: 2;
+    max-width: 280px;
+  }
+
+  .qr-placeholder {
+    width: 120px;
+    height: 120px;
+    border: 2px solid #1a1410;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #8a7b6b;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    background: white;
+    padding: 8px;
+  }
+
+  .footer-text {
+    font-size: 9px;
+    color: #b0a090;
+    letter-spacing: 2px;
+    margin-top: auto;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media print {
+    body { background: white; }
+    .card { border: 1px solid #ccc; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="bg-pattern"></div>
+  <div class="tracking-elements">
+    <div class="corner-mark tl"></div>
+    <div class="corner-mark tr"></div>
+    <div class="corner-mark bl"></div>
+    <div class="corner-mark br"></div>
+    <div class="track-shape s1"></div>
+    <div class="track-shape s2"></div>
+    <div class="track-shape s3"></div>
+    <div class="track-shape s4"></div>
+  </div>
+
+  <div class="brand-name">PENTIMENTO</div>
+  <div class="divider"></div>
+  <div class="tagline">SPECIALTY COFFEE</div>
+
+  <div class="cup-illustration">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="70" rx="30" ry="8" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+      <path d="M25 35 Q25 70 35 72 L65 72 Q75 70 75 35" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M25 35 L75 35" stroke="currentColor" stroke-width="2"/>
+      <path d="M75 42 Q88 42 88 52 Q88 62 75 62" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      <path d="M40 28 Q42 18 40 10" stroke="currentColor" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+      <path d="M50 26 Q52 14 50 6" stroke="currentColor" stroke-width="1" opacity="0.3" stroke-linecap="round"/>
+      <path d="M60 28 Q62 18 60 10" stroke="currentColor" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="ar-badge">تجربه واقعیت افزوده ☕</div>
+  
+  <p class="instruction">
+    QR کد را اسکن کنید<br>
+    سپس دوربین را به سمت این کارت بگیرید
+  </p>
+
+  <div class="qr-placeholder">
+    QR Code<br>
+    <small>Print a real QR here</small><br>
+    <small style="font-size:7px; margin-top:4px; display:block;">pentimento-webar.vercel.app</small>
+  </div>
+
+  <div class="footer-text">AUGMENTED REALITY EXPERIENCE</div>
+</div>
+</body>
+</html>`;
+
+// Save
+const printDir = join(projectRoot, 'public', 'print');
+mkdirSync(printDir, { recursive: true });
+writeFileSync(join(printDir, 'pentimento-ar-card.html'), cardHtml);
+
+console.log('Card HTML generated: public/print/pentimento-ar-card.html');
+console.log('');
+console.log('To create the printable card image:');
+console.log('1. Open public/print/pentimento-ar-card.html in Chrome');
+console.log('2. Take a screenshot or Print to PDF');
+console.log('3. Save as pentimento-ar-card.png');
+console.log('');
+console.log('To create the MindAR target from the card:');
+console.log('1. Go to https://hiukim.github.io/mind-ar-js-doc/tools/compile');
+console.log('2. Upload your card image');
+console.log('3. Download the .mind file');
+console.log('4. Save it as public/targets/card.mind');
