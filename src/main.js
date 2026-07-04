@@ -141,7 +141,44 @@ async function initializeAR() {
     const posStr = `${CONFIG.arObject.position.x} ${CONFIG.arObject.position.y} ${CONFIG.arObject.position.z}`;
     const rotStr = `${CONFIG.arObject.rotation.x} ${CONFIG.arObject.rotation.y} ${CONFIG.arObject.rotation.z}`;
     
-    if (CONFIG.useFallbackModel) {
+    if (CONFIG.useLayersModel) {
+      // 2.5D Parallax Layers
+      assetsHTML = `
+        <a-assets>
+          ${CONFIG.layers.map(layer => `<img id="${layer.id}-img" src="${layer.src}" crossorigin="anonymous" />`).join('\n')}
+        </a-assets>
+      `;
+      
+      const bg = CONFIG.layers[0];
+      const mid = CONFIG.layers[1];
+      const fg = CONFIG.layers[2];
+      
+      const bgPos = `${bg.position.x} ${bg.position.y} ${bg.position.z}`;
+      const midPos = `${mid.position.x} ${mid.position.y} ${mid.position.z}`;
+      const fgPos = `${fg.position.x} ${fg.position.y} ${fg.position.z}`;
+      
+      // Floating animations for mid and fg layers to create a premium parallax depth effect
+      modelHTML = `
+        <a-entity id="layers-container">
+          <!-- Background Layer -->
+          <a-image id="${bg.id}" src="#${bg.id}-img" width="${bg.width}" height="${bg.height}" position="${bgPos}" rotation="0 0 0" material="transparent: true; alphaTest: 0.01;"></a-image>
+          
+          <!-- Midground Layer with subtle float -->
+          <a-image id="${mid.id}" src="#${mid.id}-img" width="${mid.width}" height="${mid.height}" position="${midPos}" rotation="0 0 0" material="transparent: true; alphaTest: 0.01;"
+                   animation="property: position; to: ${mid.position.x} ${mid.position.y + 0.02} ${mid.position.z + 0.02}; dur: 3500; dir: alternate; loop: true; easing: easeInOutSine;"></a-image>
+          
+          <!-- Foreground Layer with opposite float -->
+          <a-image id="${fg.id}" src="#${fg.id}-img" width="${fg.width}" height="${fg.height}" position="${fgPos}" rotation="0 0 0" material="transparent: true; alphaTest: 0.01;"
+                   animation="property: position; to: ${fg.position.x} ${fg.position.y - 0.03} ${fg.position.z + 0.04}; dur: 4500; dir: alternate; loop: true; easing: easeInOutSine;"></a-image>
+
+          <!-- Steam Particles above the coffee cup layer -->
+          <a-entity id="steam-container" position="0 -0.05 0.1">
+            <a-sphere color="#ffffff" radius="0.006" opacity="0.12" position="-0.02 0 0" animation="property: position; to: -0.01 0.15 0.02; dur: 2500; loop: true; easing: linear;"></a-sphere>
+            <a-sphere color="#ffffff" radius="0.006" opacity="0.12" position="0.02 0 0" animation="property: position; to: 0.01 0.12 -0.02; dur: 2000; loop: true; easing: linear;"></a-sphere>
+          </a-entity>
+        </a-entity>
+      `;
+    } else if (CONFIG.useFallbackModel) {
       modelHTML = `
         <a-entity id="cafe-scene-container" rotation="90 0 0" position="${posStr}" scale="${scaleStr}">
           <!-- Saucer -->

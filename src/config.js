@@ -13,22 +13,50 @@ export const CONFIG = {
   // مسیر فایل target برای MindAR (نسبت به base)
   targetPath: BASE + 'targets/card.mind',
 
-  // مسیر مدل سه‌بعدی GLB (در صورت استفاده از مدل خارجی)
-  // فایل GLB خود را در مسیر public/models/ کپی کنید و نام آن را اینجا بنویسید
+  // استفاده از تصاویر لایه‌لایه (2.5D) برای ساخت افکت پارالاکس و عمق تصویر
+  // این گزینه بهترین پایداری و سرعت لود را روی گوشی موبایل دارد
+  useLayersModel: true,
+
+  // تصاویر لایه‌ها (از عقب به جلو)
+  // فایل‌های PNG ترنسپرنت خود را در مسیر public/images/ کپی کنید
+  layers: [
+    { 
+      id: 'layer-bg', 
+      src: BASE + 'images/layer-bg.png', 
+      width: 1.0, 
+      height: 1.2, 
+      position: { x: 0, y: 0, z: 0.01 } // لایه پس‌زمینه (چسبیده به کارت)
+    },
+    { 
+      id: 'layer-mid', 
+      src: BASE + 'images/layer-mid.png', 
+      width: 0.7, 
+      height: 0.7, 
+      position: { x: 0, y: -0.1, z: 0.08 } // لایه میانی (عمق متوسط)
+    },
+    { 
+      id: 'layer-fg', 
+      src: BASE + 'images/layer-fg.png', 
+      width: 0.8, 
+      height: 0.3, 
+      position: { x: 0, y: 0.35, z: 0.15 } // لایه جلو (نزدیک‌ترین به دوربین)
+    }
+  ],
+
+  // مسیر مدل سه‌بعدی GLB (در صورت فعال بودن مدل سه بعدی)
   modelPath: BASE + 'models/coffee-cup.glb',
 
-  // استفاده از مدل fallback ساخته شده با A-Frame primitives
-  // برای لود کردن فایلی که دانلود کرده‌اید، این مقدار را false کنید
+  // استفاده از مدل fallback سه‌بعدی A-Frame (فقط در صورتی که useLayersModel و useFallbackModel هر دو فعال/غیرفعال باشند)
   useFallbackModel: false,
 
-  // تنظیمات شیء AR (چه مدل GLB چه مدل fallback)
+  // تنظیمات شیء AR سه‌بعدی (در صورت استفاده از ۳D)
   arObject: {
     scale: { x: 0.3, y: 0.3, z: 0.3 },
-    position: { x: 0, y: 0, z: 0.05 }, // مقدار کمی نزدیک‌تر به کارت
+    position: { x: 0, y: 0, z: 0.05 },
     rotation: { x: 0, y: 0, z: 0 },
   },
 
-  // تنظیمات انیمیشن
+  // تنظیمات انیمیشن افکت‌ها
   animation: {
     enableFloat: true,
     floatAmplitude: 0.008,
@@ -53,11 +81,11 @@ export const CONFIG = {
     generalError: 'خطایی رخ داد',
   },
 
-  // تنظیمات بسیار مهم فیلترهای بالا بردن پایداری و رفع لرزش MindAR
+  // تنظیمات بهینه‌سازی فیلترهای لرزش‌گیر MindAR
   mindAR: {
-    filterMinCF: 0.0001,      // پیش‌فرض 0.001 بود - کاهش به 0.0001 لرزش را شدیداً کم می‌کند
-    filterBeta: 0.001,        // پیش‌فرض 0.01 بود - کاهش به 0.001 حرکت را بسیار نرم و لنگر را قوی می‌کند
-    missTolerance: 15,        // پیش‌فرض 5 بود - افزایش به 15 مانع از گم شدن سریع هدف با تکان دست می‌شود
-    warmupTolerance: 5,       // فریم‌های مورد نیاز برای تایید مارکر
+    filterMinCF: 0.0001,
+    filterBeta: 0.001,
+    missTolerance: 15,
+    warmupTolerance: 5,
   },
 };
