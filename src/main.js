@@ -20,8 +20,7 @@ const elements = {
   scanningOverlay: document.getElementById('scanning-overlay'),
   trackingLostOverlay: document.getElementById('tracking-lost-overlay'),
   ctaButton: document.getElementById('cta-button'),
-  arScene: document.getElementById('ar-scene'),
-  arTarget: document.getElementById('ar-target'),
+  arSceneWrapper: document.getElementById('ar-scene-wrapper'),
   
   // Debug Elements
   debugPanel: document.getElementById('debug-panel'),
@@ -129,64 +128,100 @@ async function initializeAR() {
     return;
   }
 
-  // 3. Configure A-Frame Scene with target path
+  // 3. Inject A-Frame Scene dynamically with targets/card.mind
   try {
-    updateDebugConsole('Initializing MindAR scene parameters...', false);
+    updateDebugConsole('Injecting A-Frame scene markup...', false);
     const targetPath = CONFIG.targetPath;
     
-    // Set dynamic properties on the a-scene element
-    elements.arScene.setAttribute('mindar-image', 
-      `imageTargetSrc: ${targetPath}; autoStart: false; uiLoading: no; uiScanning: no;`
-    );
+    // Inject the entire A-Frame markup.
+    // Setting autoStart: true is secure here because it's executed within user-click callback stack
+    const sceneHTML = `
+      <a-scene id="ar-scene" mindar-image="imageTargetSrc: ${targetPath}; autoStart: true; uiLoading: no; uiScanning: no;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    // Show AR overlay screens
+        <a-entity mindar-image-target="targetIndex: 0" id="ar-target">
+          <!-- Cafe Scene -->
+          <a-entity id="cafe-scene-container" rotation="90 0 0" position="0 0 0">
+            <!-- Saucer -->
+            <a-cylinder color="#eee8dc" height="0.02" radius="0.4" position="0 0.01 0"></a-cylinder>
+            <a-torus color="#c9a96e" radius="0.38" radius-tubular="0.005" rotation="90 0 0" position="0 0.022 0"></a-torus>
+
+            <!-- Cup Body -->
+            <a-cylinder color="#f5f0e8" height="0.25" radius="0.16" position="0 0.13 0" material="roughness: 0.3; metalness: 0;"></a-cylinder>
+            <a-torus color="#c9a96e" radius="0.16" radius-tubular="0.005" rotation="90 0 0" position="0 0.256 0"></a-torus>
+
+            <!-- Coffee Liquid -->
+            <a-cylinder color="#3c1e0a" height="0.01" radius="0.155" position="0 0.24 0"></a-cylinder>
+            <a-circle color="#d4b896" radius="0.04" rotation="-90 0 0" position="0 0.242 0"></a-circle>
+
+            <!-- Handle -->
+            <a-torus color="#f5f0e8" radius="0.08" radius-tubular="0.015" arc="180" rotation="0 0 -90" position="0.16 0.13 0"></a-torus>
+
+            <!-- Pastry (Croissant style) -->
+            <a-entity position="-0.26 0.02 0.15" rotation="0 40 0">
+              <a-cylinder color="#c8943e" radius="0.04" height="0.12" rotation="0 0 90"></a-cylinder>
+              <a-sphere color="#c8943e" radius="0.025" position="-0.08 0 0.015" scale="1 0.6 1"></a-sphere>
+              <a-sphere color="#c8943e" radius="0.025" position="0.08 0 0.015" scale="1 0.6 1"></a-sphere>
+            </a-entity>
+
+            <!-- Steam Particles -->
+            <a-entity id="steam-container">
+              <a-sphere color="#ffffff" radius="0.008" opacity="0.15" position="-0.02 0.26 0.01" animation="property: position; to: -0.01 0.41 0.02; dur: 2500; loop: true; easing: linear;"></a-sphere>
+              <a-sphere color="#ffffff" radius="0.008" opacity="0.15" position="0.02 0.26 -0.01" animation="property: position; to: 0.01 0.38 -0.02; dur: 2000; loop: true; easing: linear;"></a-sphere>
+              <a-sphere color="#ffffff" radius="0.008" opacity="0.15" position="0 0.28 0" animation="property: position; to: 0 0.44 0.01; dur: 3000; loop: true; easing: linear;"></a-sphere>
+            </a-entity>
+          </a-entity>
+        </a-entity>
+      </a-scene>
+    `;
+    
+    // Inject scene wrapper
+    elements.arSceneWrapper.innerHTML = sceneHTML;
+    
+    // Retrieve references to injected elements
+    const arScene = document.getElementById('ar-scene');
+    const arTarget = document.getElementById('ar-target');
+
+    // Show AR screen
     showScreen('ar');
     elements.scanningOverlay.classList.add('active');
     
-    updateDebugConsole('Starting A-Frame AR System...', false);
-    
-    // Make sure a-scene is loaded
-    if (elements.arScene.hasLoaded) {
-      startARSystem();
-    } else {
-      elements.arScene.addEventListener('loaded', startARSystem);
-    }
+    updateDebugConsole('A-Frame DOM injected. Monitoring initialization...', false);
 
-  } catch (err) {
-    console.error('AR initialization failed:', err);
-    showError(CONFIG.ui.generalError, err.message);
-  }
-}
-
-function startARSystem() {
-  try {
-    const arSystem = elements.arScene.systems['mindar-image-system'];
-    if (!arSystem) {
-      throw new Error('mindar-image-system not found on a-scene');
-    }
-    
-    arSystem.start();
-    updateDebugConsole('MindAR engine started successfully', false);
-
-    // Setup Target Event Listeners
-    if (elements.arTarget) {
-      elements.arTarget.addEventListener('targetFound', () => {
+    // Setup Target Event Listeners on the injected element
+    if (arTarget) {
+      arTarget.addEventListener('targetFound', () => {
         elements.scanningOverlay.classList.remove('active');
         elements.trackingLostOverlay.classList.remove('active');
         elements.ctaButton.classList.add('visible');
         updateDebugConsole('Target Found', false);
       });
 
-      elements.arTarget.addEventListener('targetLost', () => {
+      arTarget.addEventListener('targetLost', () => {
         elements.trackingLostOverlay.classList.add('active');
         elements.ctaButton.classList.remove('visible');
         updateDebugConsole('Target Lost', false);
       });
     }
 
+    // Monitor A-Frame loaded state
+    if (arScene.hasLoaded) {
+      updateDebugConsole('MindAR A-Frame system initialized (cached)', false);
+    } else {
+      arScene.addEventListener('loaded', () => {
+        updateDebugConsole('MindAR A-Frame system initialized (loaded)', false);
+      });
+    }
+
+    // Capture A-Frame scene errors
+    arScene.addEventListener('arError', (event) => {
+      console.error('AR System Error event:', event);
+      showError(CONFIG.ui.generalError, `AR System Error: ${event.detail.error}`);
+    });
+
   } catch (err) {
-    console.error('Failed to start MindAR system:', err);
-    showError(CONFIG.ui.generalError, `System start failure: ${err.message}`);
+    console.error('AR initialization failed:', err);
+    showError(CONFIG.ui.generalError, err.message);
   }
 }
 
@@ -198,7 +233,6 @@ elements.startBtn.addEventListener('click', () => {
 });
 
 elements.retryBtn.addEventListener('click', () => {
-  // Reload the page to reset all systems completely
   window.location.reload();
 });
 
