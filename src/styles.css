@@ -225,11 +225,11 @@ html, body {
 
 /* ===================== AR Screen ===================== */
 #ar-screen {
-  background: #000;
+  background: transparent;
   z-index: 5;
 }
 
-#ar-container {
+#ar-scene-wrapper {
   position: absolute;
   inset: 0;
   width: 100%;

@@ -175,16 +175,16 @@ async function initializeAR() {
       </a-scene>
     `;
     
+    // Show AR screen FIRST to ensure container has valid dimensions when A-Frame parses it
+    showScreen('ar');
+    elements.scanningOverlay.classList.add('active');
+    
     // Inject scene wrapper
     elements.arSceneWrapper.innerHTML = sceneHTML;
     
     // Retrieve references to injected elements
     const arScene = document.getElementById('ar-scene');
     const arTarget = document.getElementById('ar-target');
-
-    // Show AR screen
-    showScreen('ar');
-    elements.scanningOverlay.classList.add('active');
     
     updateDebugConsole('A-Frame DOM injected. Monitoring initialization...', false);
 
