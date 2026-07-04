@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/styles.css" />
+  <!-- CDN Scripts for A-Frame and MindAR A-Frame -->
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
   <!-- Landing Screen -->
@@ -31,7 +34,7 @@
           </svg>
         </div>
         <h1 class="landing-title">تجربه واقعیت افزوده پنتیمنتو</h1>
-        <p class="landing-subtitle">دوربین را به سمت کارت بگیرید و تجربه را شروع کنید</p>
+        <p class="landing-subtitle">برای شروع، اجازه دسترسی به دوربین را بدهید</p>
       </div>
       <button id="start-btn" class="start-button">
         <span>شروع تجربه</span>
@@ -53,14 +56,50 @@
         <div class="spinner-ring"></div>
         <div class="spinner-ring"></div>
       </div>
-      <p class="loading-text" id="loading-text">در حال آمادهسازی...</p>
+      <p class="loading-text" id="loading-text">در حال آماده‌سازی...</p>
     </div>
   </div>
 
   <!-- AR Screen -->
   <div id="ar-screen" class="screen">
-    <!-- MindAR container -->
-    <div id="ar-container"></div>
+    <!-- A-Frame Scene (configured dynamically in main.js) -->
+    <a-scene id="ar-scene" mindar-image="imageTargetSrc: ; autoStart: false; uiLoading: no; uiScanning: no;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0" id="ar-target">
+        <!-- Cafe Scene -->
+        <a-entity id="cafe-scene-container" rotation="90 0 0" position="0 0 0">
+          <!-- Saucer -->
+          <a-cylinder color="#eee8dc" height="0.02" radius="0.4" position="0 0.01 0"></a-cylinder>
+          <a-torus color="#c9a96e" radius="0.38" radius-tubular="0.005" rotation="90 0 0" position="0 0.022 0"></a-torus>
+
+          <!-- Cup Body -->
+          <a-cylinder color="#f5f0e8" height="0.25" radius="0.16" position="0 0.13 0" material="roughness: 0.3; metalness: 0;"></a-cylinder>
+          <a-torus color="#c9a96e" radius="0.16" radius-tubular="0.005" rotation="90 0 0" position="0 0.256 0"></a-torus>
+
+          <!-- Coffee Liquid -->
+          <a-cylinder color="#3c1e0a" height="0.01" radius="0.155" position="0 0.24 0"></a-cylinder>
+          <a-circle color="#d4b896" radius="0.04" rotation="-90 0 0" position="0 0.242 0"></a-circle>
+
+          <!-- Handle -->
+          <a-torus color="#f5f0e8" radius="0.08" radius-tubular="0.015" arc="180" rotation="0 0 -90" position="0.16 0.13 0"></a-torus>
+
+          <!-- Pastry (Croissant style) -->
+          <a-entity position="-0.26 0.02 0.15" rotation="0 40 0">
+            <a-cylinder color="#c8943e" radius="0.04" height="0.12" rotation="0 0 90"></a-cylinder>
+            <a-sphere color="#c8943e" radius="0.025" position="-0.08 0 0.015" scale="1 0.6 1"></a-sphere>
+            <a-sphere color="#c8943e" radius="0.025" position="0.08 0 0.015" scale="1 0.6 1"></a-sphere>
+          </a-entity>
+
+          <!-- Steam Particles -->
+          <a-entity id="steam-container">
+            <a-sphere color="#ffffff" radius="0.008" opacity="0.15" position="-0.02 0.26 0.01" animation="property: position; to: -0.01 0.41 0.02; dur: 2500; loop: true; easing: linear;"></a-sphere>
+            <a-sphere color="#ffffff" radius="0.008" opacity="0.15" position="0.02 0.26 -0.01" animation="property: position; to: 0.01 0.38 -0.02; dur: 2000; loop: true; easing: linear;"></a-sphere>
+            <a-sphere color="#ffffff" radius="0.008" opacity="0.15" position="0 0.28 0" animation="property: position; to: 0 0.44 0.01; dur: 3000; loop: true; easing: linear;"></a-sphere>
+          </a-entity>
+        </a-entity>
+      </a-entity>
+    </a-scene>
 
     <!-- Scanning overlay -->
     <div id="scanning-overlay" class="ar-overlay active">
@@ -71,7 +110,7 @@
         <div class="scan-corner bottom-left"></div>
         <div class="scan-line"></div>
       </div>
-      <p class="scan-text">کارت را داخل کادر دوربین نگه دارید</p>
+      <p class="scan-text">دوربین را به سمت مارکر تست بگیرید</p>
     </div>
 
     <!-- Tracking lost overlay -->
@@ -82,7 +121,7 @@
           <circle cx="12" cy="12" r="3"/>
           <path d="M3 9h18M3 15h18M9 3v18M15 3v18" opacity="0.3"/>
         </svg>
-        <p>کارت را دوباره داخل دید دوربین قرار دهید</p>
+        <p>مارکر را دوباره داخل کادر قرار دهید</p>
       </div>
     </div>
 
@@ -107,6 +146,20 @@
         <span>تلاش مجدد</span>
       </button>
     </div>
+  </div>
+
+  <!-- Debug Panel (Troubleshooting & Realtime Diagnostics) -->
+  <div id="debug-panel" class="debug-panel">
+    <div class="debug-header">Debug Console</div>
+    <div class="debug-row"><span>Base URL:</span> <span id="debug-base">-</span></div>
+    <div class="debug-row"><span>Secure Context:</span> <span id="debug-secure">-</span></div>
+    <div class="debug-row"><span>Media Devices:</span> <span id="debug-devices">-</span></div>
+    <div class="debug-row"><span>getUserMedia:</span> <span id="debug-getusermedia">-</span></div>
+    <div class="debug-row"><span>A-Frame:</span> <span id="debug-aframe">-</span></div>
+    <div class="debug-row"><span>MindAR:</span> <span id="debug-mindar">-</span></div>
+    <div class="debug-row"><span>Target Path:</span> <span id="debug-target">-</span></div>
+    <div class="debug-row"><span>Status/Errors:</span> <span id="debug-status" class="status-ok">No errors</span></div>
+    <button id="close-debug-btn" class="close-debug-btn">بستن دباگ</button>
   </div>
 
   <script type="module" src="/src/main.js"></script>

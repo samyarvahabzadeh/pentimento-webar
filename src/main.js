@@ -1,7 +1,7 @@
 import { CONFIG } from './config.js';
 
 // ============================================
-// Pentimento WebAR - Main Application
+// Pentimento WebAR - Main A-Frame Application
 // ============================================
 
 // DOM Elements
@@ -20,440 +20,194 @@ const elements = {
   scanningOverlay: document.getElementById('scanning-overlay'),
   trackingLostOverlay: document.getElementById('tracking-lost-overlay'),
   ctaButton: document.getElementById('cta-button'),
-  arContainer: document.getElementById('ar-container'),
+  arScene: document.getElementById('ar-scene'),
+  arTarget: document.getElementById('ar-target'),
+  
+  // Debug Elements
+  debugPanel: document.getElementById('debug-panel'),
+  debugBase: document.getElementById('debug-base'),
+  debugSecure: document.getElementById('debug-secure'),
+  debugDevices: document.getElementById('debug-devices'),
+  debugGetUserMedia: document.getElementById('debug-getusermedia'),
+  debugAFrame: document.getElementById('debug-aframe'),
+  debugMindAR: document.getElementById('debug-mindar'),
+  debugTarget: document.getElementById('debug-target'),
+  debugStatus: document.getElementById('debug-status'),
+  closeDebugBtn: document.getElementById('close-debug-btn'),
 };
 
-// State
-let mindarThree = null;
-let cafeScene = null;
-let animationFrameId = null;
-let isTracking = false;
+// ============================================
+// Debug Console Helper
+// ============================================
+function updateDebugConsole(statusMsg, isError = false) {
+  try {
+    elements.debugBase.textContent = import.meta.env.BASE_URL || '/';
+    elements.debugSecure.textContent = window.isSecureContext ? 'Yes (Secure)' : 'No (Not Secure)';
+    elements.debugDevices.textContent = navigator.mediaDevices ? 'Yes' : 'No';
+    elements.debugGetUserMedia.textContent = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ? 'Yes' : 'No';
+    elements.debugAFrame.textContent = (typeof AFRAME !== 'undefined') ? `Yes (${AFRAME.version})` : 'No';
+    elements.debugMindAR.textContent = (window.MINDAR && window.MINDAR.IMAGE) ? 'Yes' : 'No';
+    elements.debugTarget.textContent = CONFIG.targetPath;
+
+    if (statusMsg) {
+      elements.debugStatus.textContent = statusMsg;
+      if (isError) {
+        elements.debugStatus.className = 'status-error';
+      } else {
+        elements.debugStatus.className = 'status-ok';
+      }
+    }
+  } catch (e) {
+    console.error('Debug console update error:', e);
+  }
+}
+
+// Close debug panel click
+if (elements.closeDebugBtn) {
+  elements.closeDebugBtn.addEventListener('click', () => {
+    elements.debugPanel.style.display = 'none';
+  });
+}
+
+// Initialize debug display
+updateDebugConsole('Page loaded. Waiting for start...', false);
 
 // ============================================
 // Screen Management
 // ============================================
 function showScreen(screenName) {
-  Object.values(screens).forEach(s => s.classList.remove('active'));
+  Object.keys(screens).forEach(key => {
+    screens[key].classList.remove('active');
+  });
   if (screens[screenName]) {
     screens[screenName].classList.add('active');
   }
 }
 
-function showError(message) {
-  elements.errorText.textContent = message || CONFIG.ui.generalError;
+function showError(message, techInfo = '') {
+  elements.errorText.innerHTML = `${message}<br><small style="font-size: 0.75rem; opacity: 0.7;">${techInfo}</small>`;
+  updateDebugConsole(techInfo || message, true);
   showScreen('error');
 }
 
 // ============================================
-// 3D Cafe Scene Builder (Fallback with Three.js primitives)
+// Camera Permission & AR Initialization
 // ============================================
-function createCafeScene(THREE) {
-  const group = new THREE.Group();
-
-  // Materials
-  const ceramicMat = new THREE.MeshPhysicalMaterial({
-    color: 0xf5f0e8,
-    roughness: 0.3,
-    metalness: 0.0,
-    clearcoat: 0.4,
-    clearcoatRoughness: 0.2,
-  });
-
-  const coffeeMat = new THREE.MeshPhysicalMaterial({
-    color: 0x3c1e0a,
-    roughness: 0.1,
-    metalness: 0.0,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.1,
-  });
-
-  const saucerMat = new THREE.MeshPhysicalMaterial({
-    color: 0xeee8dc,
-    roughness: 0.35,
-    metalness: 0.0,
-    clearcoat: 0.3,
-  });
-
-  const goldAccent = new THREE.MeshPhysicalMaterial({
-    color: 0xc9a96e,
-    roughness: 0.2,
-    metalness: 0.8,
-    clearcoat: 0.5,
-  });
-
-  // Saucer
-  const saucerGeo = new THREE.CylinderGeometry(0.42, 0.38, 0.04, 32);
-  const saucer = new THREE.Mesh(saucerGeo, saucerMat);
-  saucer.position.y = 0.02;
-  group.add(saucer);
-
-  // Saucer rim (gold)
-  const saucerRimGeo = new THREE.TorusGeometry(0.40, 0.008, 8, 48);
-  const saucerRim = new THREE.Mesh(saucerRimGeo, goldAccent);
-  saucerRim.rotation.x = Math.PI / 2;
-  saucerRim.position.y = 0.045;
-  group.add(saucerRim);
-
-  // Cup body (using lathe for realistic shape)
-  const cupPoints = [];
-  cupPoints.push(new THREE.Vector2(0.001, 0));
-  cupPoints.push(new THREE.Vector2(0.14, 0));
-  cupPoints.push(new THREE.Vector2(0.16, 0.02));
-  cupPoints.push(new THREE.Vector2(0.15, 0.06));
-  cupPoints.push(new THREE.Vector2(0.14, 0.10));
-  cupPoints.push(new THREE.Vector2(0.145, 0.18));
-  cupPoints.push(new THREE.Vector2(0.16, 0.26));
-  cupPoints.push(new THREE.Vector2(0.175, 0.30));
-  cupPoints.push(new THREE.Vector2(0.18, 0.32));
-  cupPoints.push(new THREE.Vector2(0.178, 0.33));
-  cupPoints.push(new THREE.Vector2(0.165, 0.33));
-  cupPoints.push(new THREE.Vector2(0.16, 0.31));
-  cupPoints.push(new THREE.Vector2(0.001, 0.31));
-
-  const cupGeo = new THREE.LatheGeometry(cupPoints, 32);
-  const cup = new THREE.Mesh(cupGeo, ceramicMat);
-  cup.position.y = 0.04;
-  group.add(cup);
-
-  // Cup gold rim
-  const cupRimGeo = new THREE.TorusGeometry(0.172, 0.006, 8, 32);
-  const cupRim = new THREE.Mesh(cupRimGeo, goldAccent);
-  cupRim.rotation.x = Math.PI / 2;
-  cupRim.position.y = 0.375;
-  group.add(cupRim);
-
-  // Coffee liquid surface
-  const coffeeGeo = new THREE.CircleGeometry(0.155, 32);
-  const coffee = new THREE.Mesh(coffeeGeo, coffeeMat);
-  coffee.rotation.x = -Math.PI / 2;
-  coffee.position.y = 0.35;
-  group.add(coffee);
-
-  // Latte art (simple heart shape using small circle)
-  const latteArtMat = new THREE.MeshPhysicalMaterial({
-    color: 0xd4b896,
-    roughness: 0.1,
-    metalness: 0.0,
-    transparent: true,
-    opacity: 0.6,
-  });
-  const artGeo = new THREE.CircleGeometry(0.04, 16);
-  const art = new THREE.Mesh(artGeo, latteArtMat);
-  art.rotation.x = -Math.PI / 2;
-  art.position.y = 0.352;
-  art.position.z = -0.02;
-  group.add(art);
-
-  // Cup handle
-  const handleCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.17, 0.28, 0),
-    new THREE.Vector3(0.28, 0.26, 0),
-    new THREE.Vector3(0.30, 0.20, 0),
-    new THREE.Vector3(0.28, 0.14, 0),
-    new THREE.Vector3(0.17, 0.12, 0),
-  ]);
-  const handleGeo = new THREE.TubeGeometry(handleCurve, 20, 0.015, 8, false);
-  const handle = new THREE.Mesh(handleGeo, ceramicMat);
-  handle.position.y = 0.04;
-  group.add(handle);
-
-  // Steam particles
-  const steamGroup = new THREE.Group();
-  steamGroup.position.y = 0.38;
-
-  if (CONFIG.animation.enableSteam) {
-    const steamCount = CONFIG.animation.steamParticleCount;
-    const steamGeo = new THREE.SphereGeometry(0.008, 6, 6);
-    const steamMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.15,
-      depthWrite: false,
-    });
-
-    for (let i = 0; i < steamCount; i++) {
-      const particle = new THREE.Mesh(steamGeo, steamMat.clone());
-      particle.position.set(
-        (Math.random() - 0.5) * 0.12,
-        Math.random() * 0.15,
-        (Math.random() - 0.5) * 0.12
-      );
-      particle.userData.speed = 0.01 + Math.random() * 0.02;
-      particle.userData.offset = Math.random() * Math.PI * 2;
-      particle.userData.maxY = 0.08 + Math.random() * 0.12;
-      steamGroup.add(particle);
-    }
-  }
-  group.add(steamGroup);
-
-  // Small croissant-like pastry
-  const pastryGroup = new THREE.Group();
-  const pastryMat = new THREE.MeshPhysicalMaterial({
-    color: 0xc8943e,
-    roughness: 0.7,
-    metalness: 0.0,
-  });
-
-  // Body of croissant
-  const pastryBody = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.04, 0.12, 8, 12),
-    pastryMat
-  );
-  pastryBody.rotation.z = Math.PI / 2;
-  pastryBody.scale.set(1, 0.7, 0.8);
-  pastryGroup.add(pastryBody);
-
-  // Croissant curve
-  const pastryEnd1 = new THREE.Mesh(
-    new THREE.SphereGeometry(0.025, 8, 8),
-    pastryMat
-  );
-  pastryEnd1.position.set(-0.08, -0.005, 0.015);
-  pastryEnd1.scale.y = 0.6;
-  pastryGroup.add(pastryEnd1);
-
-  const pastryEnd2 = new THREE.Mesh(
-    new THREE.SphereGeometry(0.025, 8, 8),
-    pastryMat
-  );
-  pastryEnd2.position.set(0.08, -0.005, 0.015);
-  pastryEnd2.scale.y = 0.6;
-  pastryGroup.add(pastryEnd2);
-
-  pastryGroup.position.set(-0.28, 0.04, 0.15);
-  pastryGroup.rotation.y = 0.4;
-  group.add(pastryGroup);
-
-  // Scale and position entire scene
-  const scale = CONFIG.arObject.scale;
-  group.scale.set(scale.x, scale.y, scale.z);
-
-  const pos = CONFIG.arObject.position;
-  group.position.set(pos.x, pos.y, pos.z);
-
-  return { group, steamGroup };
-}
-
-// ============================================
-// Steam Animation
-// ============================================
-function animateSteam(steamGroup, time) {
-  if (!steamGroup) return;
-  steamGroup.children.forEach((particle) => {
-    const speed = particle.userData.speed;
-    const offset = particle.userData.offset;
-    const maxY = particle.userData.maxY;
-
-    particle.position.y += speed * 0.3;
-    particle.position.x += Math.sin(time * 2 + offset) * 0.0003;
-    particle.position.z += Math.cos(time * 1.5 + offset) * 0.0003;
-
-    // Fade out as it rises
-    const progress = particle.position.y / maxY;
-    if (particle.material) {
-      particle.material.opacity = 0.15 * (1 - progress);
-    }
-
-    // Reset particle
-    if (particle.position.y > maxY) {
-      particle.position.set(
-        (Math.random() - 0.5) * 0.12,
-        0,
-        (Math.random() - 0.5) * 0.12
-      );
-    }
-  });
-}
-
-// ============================================
-// Load CDN Scripts
-// ============================================
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    // Check if already loaded
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = src;
-    script.async = true;
-    script.onload = resolve;
-    script.onerror = () => reject(new Error(`Failed to load: ${src}`));
-    document.head.appendChild(script);
-  });
-}
-
-async function loadDependencies() {
-  elements.loadingText.textContent = CONFIG.ui.loading;
-
-  // Load Three.js first
-  await loadScript('https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js');
-
-  // Load MindAR (image tracking, three.js integration)
-  await loadScript('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js');
-
-  return window.THREE;
-}
-
-// ============================================
-// AR Session
-// ============================================
-async function startAR() {
+async function initializeAR() {
   showScreen('loading');
+  elements.loadingText.textContent = CONFIG.ui.loading;
+  updateDebugConsole('Checking media devices permissions...', false);
 
-  try {
-    const THREE = await loadDependencies();
-    if (!THREE) {
-      throw new Error('Three.js not loaded');
+  // 1. Verify Browser Support
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    let techInfo = 'Devices API not supported';
+    if (!window.isSecureContext && !isLocal) {
+      techInfo = 'Not a secure context (HTTPS required)';
+      showError(CONFIG.ui.unsupportedBrowser, 'مرورگر یا آدرس فعلی اجازه دسترسی به دوربین نمی‌دهد. سایت باید حتماً روی HTTPS باز شود.');
+    } else {
+      showError(CONFIG.ui.unsupportedBrowser, 'مرورگر یا دستگاه شما از وب‌کم پشتیبانی نمی‌کند.');
     }
+    return;
+  }
 
-    elements.loadingText.textContent = 'در حال راهاندازی دوربین...';
-
-    // Initialize MindAR
-    mindarThree = new window.MINDAR.IMAGE.MindARThree({
-      container: elements.arContainer,
-      imageTargetSrc: CONFIG.targetPath,
-      filterMinCF: CONFIG.mindAR.filterMinCF,
-      filterBeta: CONFIG.mindAR.filterBeta,
-      missTolerance: CONFIG.mindAR.missTolerance,
-      warmupTolerance: CONFIG.mindAR.warmupTolerance,
-      uiLoading: 'no',
-      uiScanning: 'no',
-      uiError: 'no',
+  // 2. Request Camera Permission Directly
+  let testStream = null;
+  try {
+    updateDebugConsole('Invoking getUserMedia...', false);
+    testStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' },
+      audio: false
     });
+    
+    updateDebugConsole('Camera permission granted, stopping test stream...', false);
+    // Stop the stream immediately to free camera for MindAR
+    testStream.getTracks().forEach(track => track.stop());
+  } catch (err) {
+    console.error('Camera permission request failed:', err);
+    showError(CONFIG.ui.cameraDenied, `${err.name}: ${err.message}`);
+    return;
+  }
 
-    const { renderer, scene, camera } = mindarThree;
+  // 3. Configure A-Frame Scene with target path
+  try {
+    updateDebugConsole('Initializing MindAR scene parameters...', false);
+    const targetPath = CONFIG.targetPath;
+    
+    // Set dynamic properties on the a-scene element
+    elements.arScene.setAttribute('mindar-image', 
+      `imageTargetSrc: ${targetPath}; autoStart: false; uiLoading: no; uiScanning: no;`
+    );
 
-    // Configure renderer
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xfff5e6, 0.8);
-    scene.add(ambientLight);
-
-    const dirLight = new THREE.DirectionalLight(0xfff8f0, 1.2);
-    dirLight.position.set(2, 4, 3);
-    dirLight.castShadow = false;
-    scene.add(dirLight);
-
-    const fillLight = new THREE.DirectionalLight(0xe8d5b5, 0.4);
-    fillLight.position.set(-2, 1, -1);
-    scene.add(fillLight);
-
-    // Get anchor
-    const anchor = mindarThree.addAnchor(0);
-
-    // Create 3D cafe scene
-    cafeScene = createCafeScene(THREE);
-    anchor.group.add(cafeScene.group);
-
-    // Tracking events
-    anchor.onTargetFound = () => {
-      isTracking = true;
-      elements.scanningOverlay.classList.remove('active');
-      elements.trackingLostOverlay.classList.remove('active');
-      elements.ctaButton.classList.add('visible');
-    };
-
-    anchor.onTargetLost = () => {
-      isTracking = false;
-      elements.trackingLostOverlay.classList.add('active');
-      elements.ctaButton.classList.remove('visible');
-    };
-
-    // Start AR
-    elements.loadingText.textContent = 'در حال شروع...';
-    await mindarThree.start();
-
-    // Show AR screen
+    // Show AR overlay screens
     showScreen('ar');
     elements.scanningOverlay.classList.add('active');
-
-    // Animation loop
-    const clock = new THREE.Clock();
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
-
-      if (cafeScene && isTracking) {
-        // Gentle floating
-        if (CONFIG.animation.enableFloat) {
-          cafeScene.group.position.y = CONFIG.arObject.position.y +
-            Math.sin(elapsed * CONFIG.animation.floatSpeed) * CONFIG.animation.floatAmplitude;
-        }
-
-        // Subtle rotation
-        if (CONFIG.animation.enableRotation) {
-          cafeScene.group.rotation.y = CONFIG.arObject.rotation.z +
-            Math.sin(elapsed * CONFIG.animation.rotationSpeed) * 0.05;
-        }
-
-        // Steam animation
-        if (CONFIG.animation.enableSteam) {
-          animateSteam(cafeScene.steamGroup, elapsed);
-        }
-      }
-
-      renderer.render(scene, camera);
-    };
-    animate();
-
-  } catch (error) {
-    console.error('AR Error:', error);
-
-    if (error.name === 'NotAllowedError' || error.message?.includes('Permission')) {
-      showError(CONFIG.ui.cameraDenied);
-    } else if (error.message?.includes('getUserMedia') || error.message?.includes('not supported')) {
-      showError(CONFIG.ui.unsupportedBrowser);
+    
+    updateDebugConsole('Starting A-Frame AR System...', false);
+    
+    // Make sure a-scene is loaded
+    if (elements.arScene.hasLoaded) {
+      startARSystem();
     } else {
-      showError(CONFIG.ui.generalError);
+      elements.arScene.addEventListener('loaded', startARSystem);
     }
+
+  } catch (err) {
+    console.error('AR initialization failed:', err);
+    showError(CONFIG.ui.generalError, err.message);
   }
 }
 
-// ============================================
-// Cleanup
-// ============================================
-function stopAR() {
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
-  }
-  if (mindarThree) {
-    try {
-      mindarThree.stop();
-    } catch (e) {
-      console.warn('Stop error:', e);
+function startARSystem() {
+  try {
+    const arSystem = elements.arScene.systems['mindar-image-system'];
+    if (!arSystem) {
+      throw new Error('mindar-image-system not found on a-scene');
     }
-    mindarThree = null;
+    
+    arSystem.start();
+    updateDebugConsole('MindAR engine started successfully', false);
+
+    // Setup Target Event Listeners
+    if (elements.arTarget) {
+      elements.arTarget.addEventListener('targetFound', () => {
+        elements.scanningOverlay.classList.remove('active');
+        elements.trackingLostOverlay.classList.remove('active');
+        elements.ctaButton.classList.add('visible');
+        updateDebugConsole('Target Found', false);
+      });
+
+      elements.arTarget.addEventListener('targetLost', () => {
+        elements.trackingLostOverlay.classList.add('active');
+        elements.ctaButton.classList.remove('visible');
+        updateDebugConsole('Target Lost', false);
+      });
+    }
+
+  } catch (err) {
+    console.error('Failed to start MindAR system:', err);
+    showError(CONFIG.ui.generalError, `System start failure: ${err.message}`);
   }
-  cafeScene = null;
-  isTracking = false;
 }
 
 // ============================================
 // Event Listeners
 // ============================================
 elements.startBtn.addEventListener('click', () => {
-  startAR();
+  initializeAR();
 });
 
 elements.retryBtn.addEventListener('click', () => {
-  stopAR();
-  showScreen('landing');
+  // Reload the page to reset all systems completely
+  window.location.reload();
 });
 
-// CTA link from config
+// Set Instagram link
 elements.ctaButton.href = CONFIG.instagramUrl;
 
-// Prevent zoom on double-tap
+// Prevent pinch-zooming / touch behaviors
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length > 1) e.preventDefault();
 }, { passive: false });
 
-// Log ready
-console.log('Pentimento WebAR Ready');
+console.log('Pentimento WebAR A-Frame main script loaded');

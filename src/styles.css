@@ -464,3 +464,72 @@ html, body {
   .landing-subtitle { font-size: 1.1rem; max-width: 400px; }
   .scan-frame { width: 300px; height: 300px; }
 }
+
+/* ===================== Debug Panel ===================== */
+.debug-panel {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  max-width: 380px;
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  direction: ltr;
+}
+
+.debug-header {
+  font-weight: 700;
+  color: var(--color-primary);
+  border-bottom: 1px solid rgba(201, 169, 110, 0.2);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.debug-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.debug-row span:first-child {
+  color: var(--color-text-muted);
+}
+
+.debug-row span:last-child {
+  color: var(--color-text);
+  word-break: break-all;
+  text-align: right;
+}
+
+.status-ok {
+  color: #5de85d !important;
+}
+
+.status-error {
+  color: var(--color-error) !important;
+}
+
+.close-debug-btn {
+  background: var(--color-primary);
+  color: #1a1410;
+  border: none;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: bold;
+  font-family: var(--font-main);
+  margin-top: 6px;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
