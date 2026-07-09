@@ -32,14 +32,14 @@ export const CONFIG = {
       src: BASE + 'images/layer-mid.png', 
       width: 0.8, 
       height: 0.8, 
-      position: { x: 0, y: 0.05, z: 0.3 }
+      position: { x: 0, y: 0.05, z: 0.45 }
     },
     { 
       id: 'layer-fg', 
       src: BASE + 'images/layer-fg.png', 
-      width: 0.7, 
-      height: 0.7, 
-      position: { x: 0, y: 0.15, z: 0.6 }
+      width: 1.0, 
+      height: 1.25, // متناسب با نسبت تصویر ۱۱۲۲ به ۱۴۰۲ ( نسبت ۰.۸)
+      position: { x: 0.2, y: -0.05, z: 0.9 } // فاصله عمق بسیار زیاد و کمی به سمت راست جهت ایجاد پارالاکس بهتر
     }
   ],
 
