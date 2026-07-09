@@ -23,23 +23,23 @@ export const CONFIG = {
     { 
       id: 'layer-bg', 
       src: BASE + 'images/layer-bg.png', 
-      width: 1.2, 
-      height: 1.6, 
+      width: 1.3, 
+      height: 1.7, 
       position: { x: 0, y: 0.1, z: 0.01 }
     },
     { 
       id: 'layer-mid', 
       src: BASE + 'images/layer-mid.png', 
-      width: 0.9, 
-      height: 0.9, 
-      position: { x: 0, y: 0.05, z: 0.12 }
+      width: 0.8, 
+      height: 0.8, 
+      position: { x: 0, y: 0.05, z: 0.3 }
     },
     { 
       id: 'layer-fg', 
       src: BASE + 'images/layer-fg.png', 
-      width: 1.0, 
-      height: 1.0, 
-      position: { x: 0, y: 0.15, z: 0.22 }
+      width: 0.7, 
+      height: 0.7, 
+      position: { x: 0, y: 0.15, z: 0.6 }
     }
   ],
 
@@ -83,8 +83,8 @@ export const CONFIG = {
 
   // تنظیمات بهینه‌سازی فیلترهای لرزش‌گیر MindAR
   mindAR: {
-    filterMinCF: 0.0001,
-    filterBeta: 0.001,
+    filterMinCF: 0.0005,      // افزایش بسیار جزئی برای کاهش لگ حرکتی
+    filterBeta: 0.02,        // افزایش برای پاسخ‌دهی سریع‌تر و بدون تاخیر به تغییر زاویه دوربین
     missTolerance: 15,
     warmupTolerance: 5,
   },
