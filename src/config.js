@@ -32,14 +32,14 @@ export const CONFIG = {
       src: BASE + 'images/layer-mid.png', 
       width: 0.8, 
       height: 0.8, 
-      position: { x: 0, y: 0.05, z: 0.45 }
+      position: { x: 0, y: -0.25, z: 0.45 } // یای لایه دوم پایین‌تر آمد تا روی زمین قرار گیرد
     },
     { 
       id: 'layer-fg', 
       src: BASE + 'images/layer-fg.png', 
       width: 1.0, 
-      height: 1.25, // متناسب با نسبت تصویر ۱۱۲۲ به ۱۴۰۲ ( نسبت ۰.۸)
-      position: { x: 0.2, y: -0.05, z: 0.9 } // فاصله عمق بسیار زیاد و کمی به سمت راست جهت ایجاد پارالاکس بهتر
+      height: 1.25, 
+      position: { x: 0.2, y: -0.02, z: 0.9 } // تراز با سطح زمین لایه دوم (Y کف = 0.65-)
     }
   ],
 
